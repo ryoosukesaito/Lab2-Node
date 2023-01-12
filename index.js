@@ -3,7 +3,7 @@ const fs = require("fs");
 
 const server = http.createServer();
 
-server.on('request', (req, res) => {
+server.on("request", (req, res) => {
   // console.log(req);
   // res.write("Hello World!!!");
   // res.end();
@@ -25,9 +25,9 @@ server.on('request', (req, res) => {
     res.end();
   }
 
-  if (req.url === '/write-message' && req.method === 'GET') {
-    res.write('<html>');
-    res.write('<head><title> Write Message </title></head>');
+  if (req.url === "/write-message" && req.method === "GET") {
+    res.write("<html>");
+    res.write("<head><title> Write Message </title></head>");
     res.write(`
       <body>
         <h1>Write Your Message</h1>
@@ -39,50 +39,60 @@ server.on('request', (req, res) => {
           <a href="../">Back to Home</a>
       </body>
       `);
-    res.write('</html>');
+    res.write("</html>");
     return res.end();
   }
 
-  if(req.url === '/write-message' && req.method === 'POST'){
+  if (req.url === "/write-message" && req.method === "POST") {
     const body = [];
 
-    req.on('data', (chunk) => {
+    req.on("data", (chunk) => {
       console.log(`chunk: ${chunk}`);
       body.push(chunk);
     });
 
-    req.on('end', () => {
+    req.on("end", () => {
       const parsedBody = Buffer.concat(body).toString();
       // console.log(parsedBody);
 
-      const message = parsedBody.split('=')[1];
+      const message = parsedBody.split("=")[1];
       // console.log(message);
 
-      fs.writeFile('./asset/text.txt', message, (err) => {
+      fs.writeFile("./asset/text.txt", message, (err) => {
         if (err) throw err;
         res.statusCode = 302;
-        res.setHeader('Location','/');
+        res.setHeader("Location", "/");
         return res.end();
       });
     });
-
   }
 
-
   if (req.url === "/read-message") {
-    fs.readFile('./asset/text.txt', 'utf-8', (err, data) => {
-      if(err) {
+    fs.readFile("./asset/text.txt", "utf-8", (err, data) => {
+      if (err) {
         console.log(err);
         res.end(err);
-      }else {
-        res.writeHead(200, {'Content-Type': 'text/html'});
+      } else {
+        res.writeHead(200, { "Content-Type": "text/html" });
         // data.split('+').join(`\/s/g`);
         // data.replace("+",' ');
-        res.end(data, 'utf-8');
+        res.end(
+          `
+          <h2>Your message:</h2>
+          <h3>&nbsp &nbsp ${data.replace("+", " ")}</h3>
+          </br>
+          <a href="../">Back to Home</a>
+          `,
+          "utf-8"
+        );
       }
       console.log(data);
     });
   }
 });
+
+server.on('listening', () => {
+  console.log('Listening on port 8000');
+})
 
 server.listen(8000);
