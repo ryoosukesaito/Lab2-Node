@@ -76,6 +76,8 @@ server.on('request', (req, res) => {
         res.end(err);
       }else {
         res.writeHead(200, {'Content-Type': 'text/html'});
+        // data.split('+').join(`\/s/g`);
+        // data.replace("+",' ');
         res.end(data, 'utf-8');
       }
       console.log(data);
